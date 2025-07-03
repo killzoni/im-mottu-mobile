@@ -20,6 +20,7 @@ class _BaseAppState extends State<BaseApp> {
     return GetMaterialApp(
       title: 'Mottu Mobile',
       initialRoute: AppRouter.home,
+      theme: ThemeData.light(useMaterial3: false),
       getPages: [
         GetPage(
           name: AppRouter.home,

@@ -7,6 +7,21 @@ class DetailPage extends BasePage<DetailController> {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Pokemon ${controller.pokemon.name}"),
+      ),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Image.network(controller.pokemon.image),
+            Text("Nome: ${controller.pokemon.name}"),
+            Text("Altura: ${controller.pokemon.height}"),
+            Text("Peso: ${controller.pokemon.weight}"),
+          ],
+        ),
+      ),
+    );
   }
 }
