@@ -39,9 +39,10 @@ class HomePage extends BasePage<HomeController> {
                 itemCount: data?.length ?? 0,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    leading: Image.network(data![index].image),
-                    title: Text("Nome: ${data[index].name}"),
+                    // leading: Image.network(data![index].image),
+                    title: Text(data![index].name),
                     onTap: () => controller.openDetailPage(data[index]),
+                    trailing: const Icon(Icons.arrow_forward_ios),
                   );
                 },
               );
