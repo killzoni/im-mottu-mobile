@@ -35,16 +35,36 @@ class HomePage extends BasePage<HomeController> {
               ),
             ),
             stateSuccess: (data) {
-              return ListView.builder(
-                itemCount: data?.length ?? 0,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    // leading: Image.network(data![index].image),
-                    title: Text(data![index].name),
-                    onTap: () => controller.openDetailPage(data[index]),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                  );
-                },
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      onChanged: (value) {
+                        controller.filterByName(value);
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Filtrar por nome',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: data?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(data![index].name),
+                          onTap: () => controller.openDetailPage(data[index]),
+                          trailing: const Icon(Icons.arrow_forward_ios),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               );
             },
           ),
