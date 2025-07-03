@@ -29,7 +29,9 @@ class HomeController extends GetxController {
         return;
       }
 
-      pokemonState.value = StateError(message: "Erro ao consultar os dados");
+      pokemonState.value = StateError(
+        message: dataManager.messageError ?? "Erro ao consultar os dados",
+      );
     } catch (e) {
       pokemonState.value = StateError(message: "Erro ao consultar os dados");
     }

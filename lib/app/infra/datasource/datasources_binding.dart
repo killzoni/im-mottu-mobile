@@ -6,7 +6,7 @@ class DatasourcesBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<IGetPokemonDatasource>(
-      () => GetPokemonDatasource(),
+      () => GetPokemonDatasource(dio: Get.find()),
       fenix: true,
     );
   }
