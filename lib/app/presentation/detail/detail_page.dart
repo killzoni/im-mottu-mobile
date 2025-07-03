@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:im_mottu_mobile/app/domain/entities/pokemon_entity.dart';
@@ -44,9 +45,21 @@ class DetailPage extends BasePage<DetailController> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    if (data.image != null) ... {
-                      Image.network(data.image!),
+                    const SizedBox(height: 20),
+                    if (data.image != null) ...{
+                      CachedNetworkImage(
+                        imageUrl: data.image!,
+                        progressIndicatorBuilder:
+                            (context, url, downloadProgress) =>
+                                CircularProgressIndicator(
+                          value: downloadProgress.progress,
+                        ),
+                        errorWidget: (context, url, error) => const Icon(
+                          Icons.error,
+                        ),
+                      ),
                     },
+                    const SizedBox(height: 10),
                     Text("Nome: ${data.name}"),
                     Text("Altura: ${data.height}"),
                     Text("Peso: ${data.weight}"),

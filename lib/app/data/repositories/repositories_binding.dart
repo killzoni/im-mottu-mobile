@@ -8,11 +8,17 @@ class RepositoriesBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<IGetPokemonRepository>(
-      () => GetPokemonRepository(datasource: Get.find()),
+      () => GetPokemonRepository(
+        datasource: Get.find(),
+        cache: Get.find(),
+      ),
       fenix: true,
     );
     Get.lazyPut<IGetPokemonDetailRepository>(
-      () => GetPokemonDetailRepository(datasource: Get.find()),
+      () => GetPokemonDetailRepository(
+        datasource: Get.find(),
+        cache: Get.find(),
+      ),
       fenix: true,
     );
   }

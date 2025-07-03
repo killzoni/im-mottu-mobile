@@ -8,6 +8,15 @@ class PokemonModel extends PokemonEntity {
     super.weight,
   });
 
+  factory PokemonModel.fromEntity(PokemonEntity entity) {
+    return PokemonModel(
+      name: entity.name,
+      image: entity.image,
+      height: entity.height,
+      weight: entity.weight,
+    );
+  }
+
   factory PokemonModel.fromJsonOnlyName(Map<String, dynamic> json) {
     return PokemonModel(
       name: json["name"],
@@ -22,4 +31,11 @@ class PokemonModel extends PokemonEntity {
       weight: json["weight"],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        "name": name,
+        "image": image,
+        "height": height,
+        "weight": weight,
+      };
 }
