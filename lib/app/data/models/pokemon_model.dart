@@ -6,6 +6,7 @@ class PokemonModel extends PokemonEntity {
     super.image,
     super.height,
     super.weight,
+    super.types,
   });
 
   factory PokemonModel.fromEntity(PokemonEntity entity) {
@@ -14,27 +15,15 @@ class PokemonModel extends PokemonEntity {
       image: entity.image,
       height: entity.height,
       weight: entity.weight,
+      types: entity.types,
     );
   }
 
   factory PokemonModel.fromJsonNameAndImage(Map<String, dynamic> json) {
-    int extractIdFromUrl(String url) {
-      final Uri uri = Uri.parse(url);
-      final List<String >segments = uri.pathSegments;
-
-      if (segments.isNotEmpty) {
-        final lastSegment = segments.where((s) => s.isNotEmpty).last;
-        return int.tryParse(lastSegment) ?? -1;
-      }
-
-      return -1;
-    }
-
-    final int imageId = extractIdFromUrl(json["url"]);
     return PokemonModel(
-        name: json["name"],
-        image:
-            "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$imageId.png");
+      name: json["name"] ?? "",
+      image: json["sprites"]["front_default"],
+    );
   }
 
   factory PokemonModel.fromJson(Map<String, dynamic> json) {
@@ -43,13 +32,26 @@ class PokemonModel extends PokemonEntity {
       image: json["sprites"]["front_default"],
       height: json["height"],
       weight: json["weight"],
+      types: (json["types"] as List)
+          .map((json) => json["type"]?["name"]?.toString() ?? "")
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() => {
         "name": name,
-        "image": image,
+        "sprites": {
+          "front_default": image,
+        },
         "height": height,
         "weight": weight,
+        "types": types
+                ?.map((typeName) => {
+                      "type": {
+                        "name": typeName,
+                      }
+                    })
+                .toList() ??
+            [],
       };
 }

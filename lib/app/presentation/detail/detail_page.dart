@@ -43,28 +43,48 @@ class DetailPage extends BasePage<DetailController> {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
                     if (data.image != null) ...{
-                      Hero(
-                        tag: data.image ?? "",
-                        child: CachedNetworkImage(
-                          imageUrl: data.image!,
-                          height: Get.height * .2,
-                          width: Get.width * .8,
-                          progressIndicatorBuilder:
-                              (context, url, downloadProgress) =>
-                                  CircularProgressIndicator(
-                            value: downloadProgress.progress,
-                          ),
-                          errorWidget: (context, url, error) => const Icon(
-                            Icons.error,
+                      Center(
+                        child: Hero(
+                          tag: data.image ?? "",
+                          child: CachedNetworkImage(
+                            imageUrl: data.image!,
+                            height: Get.height * .2,
+                            width: Get.width * .8,
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) =>
+                                    CircularProgressIndicator(
+                              value: downloadProgress.progress,
+                            ),
+                            errorWidget: (context, url, error) => const Icon(
+                              Icons.error,
+                            ),
                           ),
                         ),
                       ),
                     },
                     const SizedBox(height: 10),
+                    SizedBox(
+                      height: 50,
+                      child: ListView.builder(
+                        itemCount: data.types?.length ?? 0,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Chip(
+                              label: Text(data.types?[index] ?? ""),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                     ListTile(
                       title: const Text("Nome"),
                       trailing: Text(data.name),
