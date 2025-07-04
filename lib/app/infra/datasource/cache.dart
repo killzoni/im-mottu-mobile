@@ -22,7 +22,7 @@ class Cache implements ICache {
     final dynamic data = json.decode(jsonData);
 
     return (data as List)
-        .map((json) => PokemonModel.fromJsonOnlyName(json))
+        .map((json) => PokemonModel.fromJsonNameAndImage(json))
         .toList();
   }
 

@@ -17,10 +17,24 @@ class PokemonModel extends PokemonEntity {
     );
   }
 
-  factory PokemonModel.fromJsonOnlyName(Map<String, dynamic> json) {
+  factory PokemonModel.fromJsonNameAndImage(Map<String, dynamic> json) {
+    int extractIdFromUrl(String url) {
+      final Uri uri = Uri.parse(url);
+      final List<String >segments = uri.pathSegments;
+
+      if (segments.isNotEmpty) {
+        final lastSegment = segments.where((s) => s.isNotEmpty).last;
+        return int.tryParse(lastSegment) ?? -1;
+      }
+
+      return -1;
+    }
+
+    final int imageId = extractIdFromUrl(json["url"]);
     return PokemonModel(
-      name: json["name"],
-    );
+        name: json["name"],
+        image:
+            "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$imageId.png");
   }
 
   factory PokemonModel.fromJson(Map<String, dynamic> json) {

@@ -47,22 +47,38 @@ class DetailPage extends BasePage<DetailController> {
                   children: [
                     const SizedBox(height: 20),
                     if (data.image != null) ...{
-                      CachedNetworkImage(
-                        imageUrl: data.image!,
-                        progressIndicatorBuilder:
-                            (context, url, downloadProgress) =>
-                                CircularProgressIndicator(
-                          value: downloadProgress.progress,
-                        ),
-                        errorWidget: (context, url, error) => const Icon(
-                          Icons.error,
+                      Hero(
+                        tag: data.image ?? "",
+                        child: CachedNetworkImage(
+                          imageUrl: data.image!,
+                          height: Get.height * .2,
+                          width: Get.width * .8,
+                          progressIndicatorBuilder:
+                              (context, url, downloadProgress) =>
+                                  CircularProgressIndicator(
+                            value: downloadProgress.progress,
+                          ),
+                          errorWidget: (context, url, error) => const Icon(
+                            Icons.error,
+                          ),
                         ),
                       ),
                     },
                     const SizedBox(height: 10),
-                    Text("Nome: ${data.name}"),
-                    Text("Altura: ${data.height}"),
-                    Text("Peso: ${data.weight}"),
+                    ListTile(
+                      title: const Text("Nome"),
+                      trailing: Text(data.name),
+                    ),
+                    const Divider(),
+                    ListTile(
+                      title: const Text("Altura"),
+                      trailing: Text(data.height.toString()),
+                    ),
+                    const Divider(),
+                    ListTile(
+                      title: const Text("Peso"),
+                      trailing: Text(data.weight.toString()),
+                    ),
                   ],
                 ),
               );

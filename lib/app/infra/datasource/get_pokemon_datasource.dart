@@ -18,7 +18,7 @@ class GetPokemonDatasource implements IGetPokemonDatasource {
 
         return DataManager.isSuccess(
             data: (data as List)
-                .map((json) => PokemonModel.fromJsonOnlyName(json))
+                .map((json) => PokemonModel.fromJsonNameAndImage(json))
                 .toList());
       }
 
