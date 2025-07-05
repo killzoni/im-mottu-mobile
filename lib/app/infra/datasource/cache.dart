@@ -68,4 +68,10 @@ class Cache implements ICache {
     final SharedPreferences prefs = await _prefs;
     await prefs.setInt(_totalItems, count);
   }
+
+  @override
+  Future<void> clearAllData() async {
+    final SharedPreferences prefs = await _prefs;
+    prefs.clear();
+  }
 }

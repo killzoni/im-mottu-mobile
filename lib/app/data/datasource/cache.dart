@@ -13,4 +13,5 @@ abstract class ICache {
 
   Future<int?> getTotalItemsPokemon();
 
+  Future<void> clearAllData();
 }

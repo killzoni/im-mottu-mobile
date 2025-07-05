@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:im_mottu_mobile/app/app_router.dart';
 import 'package:im_mottu_mobile/app/data/datasource/cache.dart';
@@ -7,7 +8,7 @@ import 'package:im_mottu_mobile/app/utils/data_manager.dart';
 import 'package:im_mottu_mobile/app/utils/state_page.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-class HomeController extends GetxController {
+class HomeController extends GetxController with WidgetsBindingObserver {
   final IGetPokemonUsecase getPokemonUsecase;
   final ICache cache;
 
@@ -29,6 +30,7 @@ class HomeController extends GetxController {
 
   @override
   void onInit() {
+    WidgetsBinding.instance.addObserver(this);
     pagingController.addPageRequestListener((offset) {
       _getPokemon(offset);
     });
@@ -38,7 +40,15 @@ class HomeController extends GetxController {
   @override
   void onClose() {
     pagingController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached) {
+      cache.clearAllData();
+    }
   }
 
   Future<void> _getPokemon(int offset) async {
