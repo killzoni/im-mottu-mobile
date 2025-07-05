@@ -13,21 +13,21 @@ class DetailPage extends BasePage<DetailController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Pokemon ${controller.getPokemonName}"),
+        title: Text("Pokémon ${controller.getPokemonName}"),
+        centerTitle: true,
       ),
       body: SafeArea(
         child: Obx(
           () => ObservableState<PokemonEntity>(
             state: controller.pokemonState.value,
-            stateLoading: () => const Center(
-              child: CircularProgressIndicator(),
-            ),
+            stateLoading: () =>
+                const Center(child: CircularProgressIndicator()),
             stateError: (e) => Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(e.message ?? "Erro ao consultar os dados"),
+                  const SizedBox(height: 10),
                   TextButton(
                     onPressed: controller.getPokemonByName,
                     child: const Text("Tentar novamente"),
@@ -40,65 +40,33 @@ class DetailPage extends BasePage<DetailController> {
                 return const SizedBox.shrink();
               }
 
-              return Center(
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 20),
-                    if (data.image != null) ...{
-                      Center(
-                        child: Hero(
-                          tag: data.image ?? "",
-                          child: CachedNetworkImage(
-                            imageUrl: data.image!,
-                            height: Get.height * .2,
-                            width: Get.width * .8,
-                            progressIndicatorBuilder:
-                                (context, url, downloadProgress) =>
-                                    CircularProgressIndicator(
-                              value: downloadProgress.progress,
-                            ),
-                            errorWidget: (context, url, error) => const Icon(
-                              Icons.error,
-                            ),
-                          ),
-                        ),
-                      ),
-                    },
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      height: 50,
-                      child: ListView.builder(
-                        itemCount: data.types?.length ?? 0,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Chip(
-                              label: Text(data.types?[index] ?? ""),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                              ),
-                            ),
-                          );
-                        },
+                    Hero(
+                      tag: data.image ?? "",
+                      child: CachedNetworkImage(
+                        imageUrl: data.image!,
+                        height: Get.height * 0.25,
+                        fit: BoxFit.contain,
+                        placeholder: (context, url) =>
+                            const Center(child: CircularProgressIndicator()),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error, size: 48),
                       ),
                     ),
-                    ListTile(
-                      title: const Text("Nome"),
-                      trailing: Text(data.name),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text("Altura"),
-                      trailing: Text(data.height.toString()),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text("Peso"),
-                      trailing: Text(data.weight.toString()),
-                    ),
+                    const SizedBox(height: 24),
+                    _buildSectionTitle("Tipo"),
+                    _buildChipList(data.types),
+                    const SizedBox(height: 16),
+                    _buildSectionTitle("Habilidades"),
+                    _buildChipList(data.abilities),
+                    const Divider(height: 32),
+                    _buildDetailTile("Nome", data.name),
+                    _buildDetailTile("Altura", "${data.height}"),
+                    _buildDetailTile("Peso", "${data.weight}"),
                   ],
                 ),
               );
@@ -106,6 +74,41 @@ class DetailPage extends BasePage<DetailController> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Widget _buildChipList(List<String>? items) {
+    if (items == null || items.isEmpty) return const SizedBox.shrink();
+
+    return Wrap(
+      spacing: 8,
+      children: items.map((item) => Chip(label: Text(item))).toList(),
+    );
+  }
+
+  Widget _buildDetailTile(String title, String value) {
+    return Column(
+      children: [
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(title),
+          trailing: Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        const Divider(),
+      ],
     );
   }
 }

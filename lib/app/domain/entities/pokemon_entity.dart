@@ -4,6 +4,7 @@ class PokemonEntity {
   final int? height;
   final int? weight;
   final List<String>? types;
+  final List<String>? abilities;
 
   PokemonEntity({
     required this.name,
@@ -11,5 +12,6 @@ class PokemonEntity {
     this.height,
     this.weight,
     this.types,
+    this.abilities,
   });
 }

@@ -7,6 +7,7 @@ class PokemonModel extends PokemonEntity {
     super.height,
     super.weight,
     super.types,
+    super.abilities,
   });
 
   factory PokemonModel.fromEntity(PokemonEntity entity) {
@@ -16,6 +17,7 @@ class PokemonModel extends PokemonEntity {
       height: entity.height,
       weight: entity.weight,
       types: entity.types,
+      abilities: entity.abilities,
     );
   }
 
@@ -35,6 +37,9 @@ class PokemonModel extends PokemonEntity {
       types: (json["types"] as List)
           .map((json) => json["type"]?["name"]?.toString() ?? "")
           .toList(),
+      abilities: (json["abilities"] as List)
+          .map((json) => json["ability"]?["name"]?.toString() ?? "")
+          .toList(),
     );
   }
 
@@ -47,9 +52,13 @@ class PokemonModel extends PokemonEntity {
         "weight": weight,
         "types": types
                 ?.map((typeName) => {
-                      "type": {
-                        "name": typeName,
-                      }
+                      "type": {"name": typeName}
+                    })
+                .toList() ??
+            [],
+        "abilities": abilities
+                ?.map((typeName) => {
+                      "ability": {"name": typeName}
                     })
                 .toList() ??
             [],
