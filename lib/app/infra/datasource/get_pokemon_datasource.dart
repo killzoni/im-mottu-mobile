@@ -14,17 +14,44 @@ class GetPokemonDatasource implements IGetPokemonDatasource {
     try {
       final Response response = await dio.get("/pokemon");
       if (response.statusCode == 200) {
-        dynamic data = response.data["results"];
+        final dynamic data = response.data["results"];
 
         return DataManager.isSuccess(
-            data: (data as List)
-                .map((json) => PokemonModel.fromJsonOnlyName(json))
-                .toList());
+            data: (data as List).map((json) {
+          json = addImageInResponse(json);
+          return PokemonModel.fromJsonNameAndImage(json);
+        }).toList());
       }
 
       return DataManager.isError(message: "Erro ao consultar os dados");
     } on DioException catch (_) {
       return DataManager.isError(message: "Erro ao consultar os dados");
     }
+  }
+
+  Map<String, dynamic> addImageInResponse(Map<String, dynamic> json) {
+    final int imageId = _extractIdFromUrl(json["url"] ?? "");
+    json.addAll(
+      {
+        "sprites": {
+          "front_default":
+              "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$imageId.png",
+        }
+      },
+    );
+
+    return json;
+  }
+
+  int _extractIdFromUrl(String url) {
+    final Uri uri = Uri.parse(url);
+    final List<String> segments = uri.pathSegments;
+
+    if (segments.isNotEmpty) {
+      final lastSegment = segments.where((s) => s.isNotEmpty).last;
+      return int.tryParse(lastSegment) ?? -1;
+    }
+
+    return -1;
   }
 }

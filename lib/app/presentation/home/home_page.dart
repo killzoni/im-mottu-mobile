@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:im_mottu_mobile/app/domain/entities/pokemon_entity.dart';
@@ -35,16 +36,51 @@ class HomePage extends BasePage<HomeController> {
               ),
             ),
             stateSuccess: (data) {
-              return ListView.builder(
-                itemCount: data?.length ?? 0,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    // leading: Image.network(data![index].image),
-                    title: Text(data![index].name),
-                    onTap: () => controller.openDetailPage(data[index]),
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                  );
-                },
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      onChanged: (value) {
+                        controller.filterByName(value);
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Filtrar por nome',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.separated(
+                      separatorBuilder: (context, index) => const Divider(),
+                      itemCount: data?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          leading: Hero(
+                            tag: data![index].image ?? "",
+                            child: CachedNetworkImage(
+                              imageUrl: data![index].image ?? "",
+                              progressIndicatorBuilder:
+                                  (context, url, downloadProgress) =>
+                                      CircularProgressIndicator(
+                                value: downloadProgress.progress,
+                              ),
+                              errorWidget: (context, url, error) => const Icon(
+                                Icons.error,
+                              ),
+                            ),
+                          ),
+                          title: Text(data![index].name),
+                          onTap: () => controller.openDetailPage(data[index]),
+                          trailing: const Icon(Icons.arrow_forward_ios),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               );
             },
           ),

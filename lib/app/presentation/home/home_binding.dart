@@ -5,7 +5,10 @@ class HomeBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut(
-      () => HomeController(getPokemonUsecase: Get.find()),
+      () => HomeController(
+        getPokemonUsecase: Get.find(),
+        cache: Get.find(),
+      ),
       fenix: true,
     );
   }
