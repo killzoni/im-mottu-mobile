@@ -16,24 +16,30 @@ class GetPokemonRepository implements IGetPokemonRepository {
   });
 
   @override
-  Future<DataManager<List<PokemonEntity>>> call() async {
-    try {
-      final List<PokemonEntity> listCache = await cache.getListPokemon();
-      if (listCache.isNotEmpty) {
-        debugPrint("return pokemon from cache");
-        return DataManager.isSuccess(data: listCache);
-      }
-    } catch (_) {
-      debugPrint("Error get pokemon in cache");
-    }
+  Future<DataManager<List<PokemonEntity>>> call({
+    required int limit,
+    required int offset,
+  }) async {
+    // try {
+    //   final List<PokemonEntity> listCache = await cache.getListPokemon();
+    //   if (listCache.isNotEmpty) {
+    //     debugPrint("return pokemon from cache");
+    //     return DataManager.isSuccess(data: listCache);
+    //   }
+    // } catch (_) {
+    //   debugPrint("Error get pokemon in cache");
+    // }
 
-    final DataManager<List<PokemonEntity>> dataManager = await datasource();
+    final DataManager<List<PokemonEntity>> dataManager = await datasource(
+      limit: limit,
+      offset: offset,
+    );
     if (dataManager.isSuccess) {
-      try {
+      // try {
         cache.saveListPokemon(dataManager.data ?? []);
-      } catch (_) {
-        debugPrint("Error save pokemon in cache");
-      }
+      // } catch (_) {
+      //   debugPrint("Error save pokemon in cache");
+      // }
     }
     return dataManager;
   }

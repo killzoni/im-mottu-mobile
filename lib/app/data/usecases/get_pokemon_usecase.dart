@@ -10,7 +10,13 @@ class GetPokemonUsecase implements IGetPokemonUsecase {
   GetPokemonUsecase({required this.repository});
 
   @override
-  Future<DataManager<List<PokemonEntity>>> call() async {
-    return repository();
+  Future<DataManager<List<PokemonEntity>>> call({
+    required int limit,
+    required int offset,
+  }) async {
+    return repository(
+      limit: limit,
+      offset: offset,
+    );
   }
 }
