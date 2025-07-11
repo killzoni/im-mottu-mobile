@@ -6,6 +6,8 @@ import 'package:im_mottu_mobile/app/presentation/detail/detail_binding.dart';
 import 'package:im_mottu_mobile/app/presentation/detail/detail_page.dart';
 import 'package:im_mottu_mobile/app/presentation/home/home_binding.dart';
 import 'package:im_mottu_mobile/app/presentation/home/home_page.dart';
+import 'package:im_mottu_mobile/app/presentation/splash/splash_binding.dart';
+import 'package:im_mottu_mobile/app/presentation/splash/splash_page.dart';
 
 class BaseApp extends StatefulWidget {
   const BaseApp({super.key});
@@ -19,9 +21,18 @@ class _BaseAppState extends State<BaseApp> {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Mottu Mobile',
-      initialRoute: AppRouter.home,
-      theme: ThemeData.light(useMaterial3: false),
+      initialRoute: AppRouter.splash,
+      theme: ThemeData(
+        useMaterial3: false,
+        primaryColor: Colors.red,
+        appBarTheme: const AppBarTheme(color: Colors.red),
+      ),
       getPages: [
+        GetPage(
+          name: AppRouter.splash,
+          page: () => SplashPage(),
+          binding: SplashBinding(),
+        ),
         GetPage(
           name: AppRouter.home,
           page: () => HomePage(),

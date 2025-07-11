@@ -10,17 +10,23 @@ class GetPokemonDatasource implements IGetPokemonDatasource {
   GetPokemonDatasource({required this.dio});
 
   @override
-  Future<DataManager<List<PokemonEntity>>> call() async {
+  Future<DataManager<List<PokemonEntity>>> call({
+    required int limit,
+    required int offset,
+  }) async {
     try {
-      final Response response = await dio.get("/pokemon");
+      final Response response =
+          await dio.get("/pokemon?limit=$limit&offset=$offset");
       if (response.statusCode == 200) {
         final dynamic data = response.data["results"];
+        final int count = response.data["count"];
 
         return DataManager.isSuccess(
+            totalItems: count,
             data: (data as List).map((json) {
-          json = addImageInResponse(json);
-          return PokemonModel.fromJsonNameAndImage(json);
-        }).toList());
+              json = addImageInResponse(json);
+              return PokemonModel.fromJsonNameAndImage(json);
+            }).toList());
       }
 
       return DataManager.isError(message: "Erro ao consultar os dados");

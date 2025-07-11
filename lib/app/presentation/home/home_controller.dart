@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:im_mottu_mobile/app/app_router.dart';
 import 'package:im_mottu_mobile/app/data/datasource/cache.dart';
@@ -5,12 +6,22 @@ import 'package:im_mottu_mobile/app/domain/entities/pokemon_entity.dart';
 import 'package:im_mottu_mobile/app/domain/usecases/get_pokemon_usecase.dart';
 import 'package:im_mottu_mobile/app/utils/data_manager.dart';
 import 'package:im_mottu_mobile/app/utils/state_page.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-class HomeController extends GetxController {
+class HomeController extends GetxController with WidgetsBindingObserver {
   final IGetPokemonUsecase getPokemonUsecase;
   final ICache cache;
 
   final Rx<StatePage<List<PokemonEntity>>> pokemonState = Rx(StateLoading());
+
+  final int pageSize = 10;
+  int totalItems = 0;
+
+  final PagingController<int, PokemonEntity> pagingController =
+      PagingController(
+    firstPageKey: 0,
+    invisibleItemsThreshold: 2,
+  );
 
   HomeController({
     required this.getPokemonUsecase,
@@ -19,27 +30,58 @@ class HomeController extends GetxController {
 
   @override
   void onInit() {
-    getPokemon();
+    WidgetsBinding.instance.addObserver(this);
+    pagingController.addPageRequestListener((offset) {
+      _getPokemon(offset);
+    });
     super.onInit();
   }
 
-  Future<void> getPokemon() async {
-    pokemonState.value = StateLoading();
-    try {
-      final DataManager<List<PokemonEntity>> dataManager =
-          await getPokemonUsecase();
+  @override
+  void onClose() {
+    pagingController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    super.onClose();
+  }
 
-      if (dataManager.isSuccess) {
-        pokemonState.value = StateSuccess(data: dataManager.data);
-        return;
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached) {
+      cache.clearAllData();
+    }
+  }
+
+  Future<void> _getPokemon(int offset) async {
+    final DataManager<List<PokemonEntity>> dataManager =
+        await getPokemonUsecase(
+      offset: offset,
+      limit: pageSize,
+    );
+
+    _handlePagination(dataManager, offset);
+  }
+
+  Future<void> _handlePagination(
+    DataManager<List<PokemonEntity>> dataManager,
+    int currentOffset,
+  ) async {
+    if (dataManager.isSuccess) {
+      totalItems = dataManager.totalItems;
+
+      final isLastPage = currentOffset + pageSize >= totalItems;
+
+      if (isLastPage) {
+        pagingController.appendLastPage(dataManager.data!);
+      } else {
+        final nextOffset = currentOffset + pageSize;
+        pagingController.appendPage(dataManager.data!, nextOffset);
       }
 
-      pokemonState.value = StateError(
-        message: dataManager.messageError ?? "Erro ao consultar os dados",
-      );
-    } catch (e) {
-      pokemonState.value = StateError(message: "Erro ao consultar os dados");
+      return;
     }
+
+    pagingController.error =
+        dataManager.messageError ?? "Desculpa, aconteceu um erro";
   }
 
   void openDetailPage(PokemonEntity pokemon) {

@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Cache implements ICache {
   static const String _pokemons = "pokemons";
+  static const String _totalItems = "totalItems";
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
@@ -54,5 +55,23 @@ class Cache implements ICache {
 
     final String data = json.encode(PokemonModel.fromEntity(pokemon).toJson());
     await prefs.setString(pokemon.name, data);
+  }
+
+  @override
+  Future<int?> getTotalItemsPokemon() async {
+    final SharedPreferences prefs = await _prefs;
+    return prefs.getInt(_totalItems);
+  }
+
+  @override
+  Future<void> saveTotalItemsPokemon(int count) async {
+    final SharedPreferences prefs = await _prefs;
+    await prefs.setInt(_totalItems, count);
+  }
+
+  @override
+  Future<void> clearAllData() async {
+    final SharedPreferences prefs = await _prefs;
+    prefs.clear();
   }
 }

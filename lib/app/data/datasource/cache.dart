@@ -8,4 +8,10 @@ abstract class ICache {
   Future<void> savePokemon(PokemonEntity pokemon);
 
   Future<PokemonEntity?> getPokemon({required String name});
+
+  Future<void> saveTotalItemsPokemon(int count);
+
+  Future<int?> getTotalItemsPokemon();
+
+  Future<void> clearAllData();
 }

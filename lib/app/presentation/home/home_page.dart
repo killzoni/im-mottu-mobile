@@ -5,6 +5,7 @@ import 'package:im_mottu_mobile/app/domain/entities/pokemon_entity.dart';
 import 'package:im_mottu_mobile/app/presentation/base_page.dart';
 import 'package:im_mottu_mobile/app/presentation/home/home_controller.dart';
 import 'package:im_mottu_mobile/app/utils/observable_state.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class HomePage extends BasePage<HomeController> {
   HomePage({super.key});
@@ -16,74 +17,78 @@ class HomePage extends BasePage<HomeController> {
         title: const Text("Pokemon"),
       ),
       body: SafeArea(
-        child: Obx(
-          () => ObservableState<List<PokemonEntity>>(
-            state: controller.pokemonState.value,
-            stateLoading: () => const Center(
-              child: CircularProgressIndicator(),
-            ),
-            stateError: (e) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(e.message ?? "Erro ao consultar os dados"),
-                  TextButton(
-                    onPressed: controller.getPokemon,
-                    child: const Text("Tentar novamente"),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                onChanged: (value) {
+                  controller.filterByName(value);
+                },
+                decoration: InputDecoration(
+                  labelText: 'Filtrar por nome',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ],
+                ),
               ),
             ),
-            stateSuccess: (data) {
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      onChanged: (value) {
-                        controller.filterByName(value);
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Filtrar por nome',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
+            Expanded(
+              child: PagedListView<int, PokemonEntity>(
+                pagingController: controller.pagingController,
+                padding: EdgeInsets.zero,
+                builderDelegate: PagedChildBuilderDelegate<PokemonEntity>(
+                  transitionDuration: const Duration(milliseconds: 500),
+                  animateTransitions: true,
+                  newPageProgressIndicatorBuilder: (context) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  firstPageErrorIndicatorBuilder: (context) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(controller.pagingController.error),
+                          const SizedBox(height: 10),
+                          TextButton(
+                            onPressed: () {
+                              controller.pagingController.refresh();
+                            },
+                            child: const Text("Tentar novamente"),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  noItemsFoundIndicatorBuilder: (context) {
+                    return const SizedBox();
+                  },
+                  itemBuilder: (context, pokemonEntity, index) {
+                    return ListTile(
+                      leading: Hero(
+                        tag: pokemonEntity.image ?? "",
+                        child: CachedNetworkImage(
+                          imageUrl: pokemonEntity.image ?? "",
+                          progressIndicatorBuilder:
+                              (context, url, downloadProgress) =>
+                                  CircularProgressIndicator(
+                            value: downloadProgress.progress,
+                          ),
+                          errorWidget: (context, url, error) => const Icon(
+                            Icons.error,
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.separated(
-                      separatorBuilder: (context, index) => const Divider(),
-                      itemCount: data?.length ?? 0,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          leading: Hero(
-                            tag: data![index].image ?? "",
-                            child: CachedNetworkImage(
-                              imageUrl: data![index].image ?? "",
-                              progressIndicatorBuilder:
-                                  (context, url, downloadProgress) =>
-                                      CircularProgressIndicator(
-                                value: downloadProgress.progress,
-                              ),
-                              errorWidget: (context, url, error) => const Icon(
-                                Icons.error,
-                              ),
-                            ),
-                          ),
-                          title: Text(data![index].name),
-                          onTap: () => controller.openDetailPage(data[index]),
-                          trailing: const Icon(Icons.arrow_forward_ios),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+                      title: Text(pokemonEntity.name),
+                      onTap: () => controller.openDetailPage(pokemonEntity),
+                      trailing: const Icon(Icons.arrow_forward_ios),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
